@@ -9,9 +9,6 @@ export default function CameraScreen() {
   // State to hold the captured photo's URI
   const [capturedPhoto, setCapturedPhoto] = useState(null);
 
-  // State to hold the latest taken photo URI
-  const [latestPhoto, setLatestPhoto] = useState(null);
-
   // Reference to the camera component
   const cameraRef = useRef(null);
 
@@ -34,7 +31,6 @@ export default function CameraScreen() {
     if (cameraRef) {
       const photo = await cameraRef.current.takePictureAsync();
       setCapturedPhoto(photo.uri); // Set captured photo's URI to state
-      setLatestPhoto(photo.uri); // Save the URI of the latest taken photo
     }
   };
 
@@ -58,7 +54,10 @@ export default function CameraScreen() {
         <View style={{ flex: 1 }}>
           <Image source={{ uri: capturedPhoto }} style={{ flex: 1 }} />
           <View style={styles.buttonContainer}>
-            <Button title="Take Photo Again" onPress={() => setCapturedPhoto(null)} />
+            <Button
+              title="Take Photo Again"
+              onPress={() => setCapturedPhoto(null)}
+            />
             <Button title="Done" onPress={handleDone} />
           </View>
         </View>
