@@ -41,7 +41,6 @@ export default function CameraScreen() {
   // Function to handle the "Done" button press
   const handleDone = () => {
     // Handle done button (Parse)
-    setCapturedPhoto(null);
   };
 
   // Handle cases when permission status is undetermined or denied
