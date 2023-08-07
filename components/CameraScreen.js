@@ -68,12 +68,15 @@ export default function CameraScreen() {
 // Styling for the Capture button container
 const styles = StyleSheet.create({
   buttonContainer: {
-    flex: 1,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-    margin: 20,
+    backgroundColor: "black",
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "flex-end",
+    paddingVertical: 12,
+    borderRadius: 8,
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
   },
 });
 ``;
