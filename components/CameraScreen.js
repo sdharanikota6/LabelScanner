@@ -9,6 +9,9 @@ export default function CameraScreen() {
   // State to hold the captured photo's URI
   const [capturedPhoto, setCapturedPhoto] = useState(null);
 
+  // State to hold the latest taken photo URI
+  const [latestPhoto, setLatestPhoto] = useState(null);
+
   // Reference to the camera component
   const cameraRef = useRef(null);
 
@@ -31,7 +34,14 @@ export default function CameraScreen() {
     if (cameraRef) {
       const photo = await cameraRef.current.takePictureAsync();
       setCapturedPhoto(photo.uri); // Set captured photo's URI to state
+      setLatestPhoto(photo.uri); // Save the URI of the latest taken photo
     }
+  };
+
+  // Function to handle the "Done" button press
+  const handleDone = () => {
+    // Handle done button (Parse)
+    setCapturedPhoto(null);
   };
 
   // Handle cases when permission status is undetermined or denied
@@ -45,13 +55,13 @@ export default function CameraScreen() {
   return (
     <View style={{ flex: 1 }}>
       {capturedPhoto ? (
-        // Display the captured photo with a Recapture button
+        // Display the captured photo with a Recapture and Done buttons
         <View style={{ flex: 1 }}>
           <Image source={{ uri: capturedPhoto }} style={{ flex: 1 }} />
-          <Button
-            title="Take Photo Again"
-            onPress={() => setCapturedPhoto(null)}
-          />
+          <View style={styles.buttonContainer}>
+            <Button title="Take Photo Again" onPress={() => setCapturedPhoto(null)} />
+            <Button title="Done" onPress={handleDone} />
+          </View>
         </View>
       ) : (
         // Display the camera view with a Capture button
@@ -65,12 +75,13 @@ export default function CameraScreen() {
   );
 }
 
-// Styling for the Capture button container
+// Styling for the Capture and Done button container
 const styles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: "black",
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
     paddingVertical: 12,
     borderRadius: 8,
     position: "absolute",
@@ -79,4 +90,3 @@ const styles = StyleSheet.create({
     right: 0,
   },
 });
-``;
