@@ -1,48 +1,60 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Button, Image, StyleSheet } from "react-native";
+import { View, Text, Button, Image, StyleSheet, Alert } from "react-native";
 import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CameraScreen() {
-  // State to hold permission status
   const [hasPermission, setHasPermission] = useState(null);
-
-  // State to hold the captured photo's URI
   const [capturedPhoto, setCapturedPhoto] = useState(null);
-
-  // Reference to the camera component
   const cameraRef = useRef(null);
 
-  // Check for camera permissions on component mount
   useEffect(() => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-      // Update permission status in state
-      if (cameraStatus.status === "granted") {
+      if (
+        cameraStatus.status === "granted" &&
+        galleryStatus.status === "granted"
+      ) {
         setHasPermission(true);
       } else {
         setHasPermission(false);
+        Alert.alert(
+          "Permission required",
+          "You need to grant camera and gallery permissions to use this feature."
+        );
       }
     })();
   }, []);
 
-  // Function to handle taking a picture
   const takePicture = async () => {
     if (cameraRef) {
       const photo = await cameraRef.current.takePictureAsync();
-      setCapturedPhoto(photo.uri); // Set captured photo's URI to state
+      setCapturedPhoto(photo.uri);
     }
   };
 
-  // Function to handle the "Done" button press
-  const handleDone = () => {
-    // Handle done button (Parse)
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setCapturedPhoto(result.assets[0].uri);
+    }
   };
 
-  // Handle cases when permission status is undetermined or denied
+  const handleDone = () => {};
+
   if (hasPermission === null) {
     return <View />;
   }
+
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
@@ -50,22 +62,21 @@ export default function CameraScreen() {
   return (
     <View style={{ flex: 1 }}>
       {capturedPhoto ? (
-        // Display the captured photo with a Recapture and Done buttons
-        <View style={{ flex: 1 }}>
-          <Image source={{ uri: capturedPhoto }} style={{ flex: 1 }} />
+        <View style={styles.fullScreenContainer}>
+          <Image
+            source={{ uri: capturedPhoto }}
+            style={styles.fullScreenImage}
+          />
           <View style={styles.buttonContainer}>
-            <Button
-              title="Take Photo Again"
-              onPress={() => setCapturedPhoto(null)}
-            />
+            <Button title="Retake" onPress={() => setCapturedPhoto(null)} />
             <Button title="Done" onPress={handleDone} />
           </View>
         </View>
       ) : (
-        // Display the camera view with a Capture button
         <Camera style={{ flex: 1 }} ref={cameraRef}>
           <View style={styles.buttonContainer}>
-            <Button title="Capture Label" onPress={takePicture} />
+            <Button title="Capture" onPress={takePicture} />
+            <Button title="Pick from Gallery" onPress={pickImage} />
           </View>
         </Camera>
       )}
@@ -73,8 +84,15 @@ export default function CameraScreen() {
   );
 }
 
-// Styling for the Capture and Done button container
 const styles = StyleSheet.create({
+  fullScreenContainer: {
+    flex: 1,
+    backgroundColor: "black",
+  },
+  fullScreenImage: {
+    flex: 1,
+    resizeMode: "contain",
+  },
   buttonContainer: {
     backgroundColor: "black",
     flexDirection: "row",
