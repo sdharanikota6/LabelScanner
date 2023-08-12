@@ -3,7 +3,7 @@ import { View, Text, Button, Image, StyleSheet, Alert } from "react-native";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 
-export default function CameraScreen() {
+export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const cameraRef = useRef(null);
@@ -85,7 +85,11 @@ export default function CameraScreen() {
           }
         );
         const textractData = await textractResponse.json();
-        setExtractedText(textractData.text);
+
+        // Navigate to the TextDisplayScreen after extracting the text
+        navigation.navigate("TextDisplay", {
+          extractedText: textractData.text,
+        });
       }
     } catch (error) {
       console.error("Error in handleDone:", error);
