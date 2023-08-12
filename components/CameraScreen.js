@@ -49,7 +49,54 @@ export default function CameraScreen() {
     }
   };
 
-  const handleDone = () => {};
+  const [extractedText, setExtractedText] = useState(null);
+
+  const handleDone = async () => {
+    try {
+      if (capturedPhoto) {
+        // 1. Request a Signed URL
+        const signedUrlResponse = await fetch(
+          "https://bt29bcadb9.execute-api.us-east-2.amazonaws.com/prod/textract",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "getSignedUrl" }),
+          }
+        );
+        const data = await signedUrlResponse.json();
+        const signedUrl = data.signedUrl;
+
+        // 2. Upload the Image to S3
+        const imageResponse = await fetch(capturedPhoto);
+        const blob = await imageResponse.blob();
+        await fetch(signedUrl, {
+          method: "PUT",
+          body: blob,
+          headers: { "Content-Type": "image/jpeg" },
+        });
+
+        // 3. Request Text Extraction
+        const textractResponse = await fetch(
+          "https://bt29bcadb9.execute-api.us-east-2.amazonaws.com/prod/textract",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageKey: data.key }),
+          }
+        );
+        const textractData = await textractResponse.json();
+        setExtractedText(textractData.text);
+      }
+    } catch (error) {
+      console.error("Error in handleDone:", error);
+      if (error instanceof TypeError) {
+        console.error(
+          "Network request failed. Additional Info:",
+          error.message
+        );
+      }
+    }
+  };
 
   if (hasPermission === null) {
     return <View />;
@@ -71,6 +118,9 @@ export default function CameraScreen() {
             <Button title="Retake" onPress={() => setCapturedPhoto(null)} />
             <Button title="Done" onPress={handleDone} />
           </View>
+          {extractedText && (
+            <Text style={{ color: "white", padding: 10 }}>{extractedText}</Text>
+          )}
         </View>
       ) : (
         <Camera style={{ flex: 1 }} ref={cameraRef}>
