@@ -1,12 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 
 export default function TextDisplayScreen({ route }) {
   const { extractedText } = route.params;
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text>{extractedText}</Text>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -15,5 +15,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 15,
+    paddingVertical: 20, // Add some padding at the bottom for better scrolling
   },
 });
