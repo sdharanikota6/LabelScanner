@@ -50,7 +50,7 @@ export default function CameraScreen({ navigation }) {
         );
         const data = await signedUrlResponse.json();
         const signedUrl = data.signedUrl;
-  
+
         // 2. Upload the Image to S3
         const imageResponse = await fetch(capturedPhoto);
         const blob = await imageResponse.blob();
@@ -59,7 +59,7 @@ export default function CameraScreen({ navigation }) {
           body: blob,
           headers: { "Content-Type": "image/jpeg" },
         });
-  
+
         // 3. Request Text Extraction
         const textractResponse = await fetch(
           "https://bt29bcadb9.execute-api.us-east-2.amazonaws.com/prod/textract",
@@ -70,7 +70,7 @@ export default function CameraScreen({ navigation }) {
           }
         );
         const textractData = await textractResponse.json();
-  
+
         // Navigate to the TextDisplayScreen after extracting the text
         navigation.navigate("TextDisplay", {
           extractedText: textractData.text,
@@ -79,13 +79,13 @@ export default function CameraScreen({ navigation }) {
     } catch (error) {
       console.error("Error in handleDone:", error);
       if (error instanceof TypeError) {
-        console.error("Network request failed. Additional Info:", error.message);
+        console.error(
+          "Network request failed. Additional Info:",
+          error.message
+        );
       }
     }
   };
-  
-
-  
 
   if (hasPermission === null) {
     return <View />;
@@ -99,7 +99,10 @@ export default function CameraScreen({ navigation }) {
     <View style={{ flex: 1 }}>
       {capturedPhoto ? (
         <View style={styles.fullScreenContainer}>
-          <Image source={{ uri: capturedPhoto }} style={styles.fullScreenImage} />
+          <Image
+            source={{ uri: capturedPhoto }}
+            style={styles.fullScreenImage}
+          />
           <View style={styles.buttonContainer}>
             <Button title="Retake" onPress={() => setCapturedPhoto(null)} />
             <Button title="Done" onPress={handleDone} />
