@@ -7,7 +7,7 @@ export default function TextDisplayScreen({ route }) {
   const [apiResponse, setApiResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const modifiedPrompt =
-    "Get the ingredients in this extracted text from AWS textract in this format. Now output each ingredient that could be harmful to someone consuming it and give a quick sentence on why it could be harmful. Don't list ingredients if they don't have any harm. Don't say anything else. Only list the ingredients in the format I specified. Here is the text: " +
+    "Get the ingredients in this extracted text from AWS textract. Don't include the nutrition facts, just the ingredients. Now output each ingredient that could be harmful to someone consuming it and give a quick sentence on why it could be harmful. Don't list ingredients if they don't have any harm. Don't say anything else. Only list the ingredients in the format I specified. Here is the text: " +
     extractedText;
 
   const fetchResponse = async () => {
