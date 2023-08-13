@@ -7,14 +7,23 @@ export default function TextDisplayScreen({ route }) {
   const [apiResponse, setApiResponse] = useState("");
   const [loading, setLoading] = useState(true);
   const modifiedPrompt =
-    "Get the ingredients in this extracted text from AWS textract. Don't include the nutrition facts, just the ingredients. Now output each ingredient that could be harmful to someone consuming it and give a quick sentence on why it could be harmful. Don't list ingredients if they don't have any harm. Don't say anything else. Only list the ingredients in the format I specified. Here is the text: " +
+    "Get the ingredients in this extracted nutrition label from AWS textract. " +
+    "Output each ingredient that could be harmful to someone consuming it " +
+    "and give a quick sentence on why it could be harmful. " +
+    "Look at the nutrition facts as well as the ingredients list. " +
+    "If something has 0 of it, for example 0g of trans fat, do not include it. " +
+    "Do not list ingredients if they don't have any harm. " +
+    "Do not say anything else. Only list the ingredients in the format I specified. " +
+    "Make sure to include every harmful ingredient. " +
+    "All of these rules are very important, follow them exactly. " +
+    "Here is the text: " +
     extractedText;
 
   const fetchResponse = async () => {
     const endpointURL = "https://api.openai.com/v1/chat/completions";
     const headers = {
       Authorization:
-        "Bearer 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",
+        "Bearer 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",
       "Content-Type": "application/json",
       Accept: "application/json",
     };
