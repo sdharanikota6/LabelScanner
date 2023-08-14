@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
-import { GPT_API } from '@env';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { GPT_API } from "@env";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function TextDisplayScreen({ route }) {
@@ -21,20 +27,24 @@ export default function TextDisplayScreen({ route }) {
     "Here is the text: " +
     extractedText;
 
-    const fetchResponse = async () => {
-      const endpointURL = "https://api.openai.com/v1/chat/completions";
-      const headers = {
-        Authorization: `Bearer ${GPT_API}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      };
+  const fetchResponse = async () => {
+    const endpointURL = "https://api.openai.com/v1/chat/completions";
+    const headers = {
+      Authorization: `Bearer ${GPT_API}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
 
     const requestBody = {
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant.",
+          content:
+            "You are a meticulous nutrition expert. " +
+            "Your primary role is to identify harmful ingredients in nutrition labels with utmost accuracy. " +
+            "Understand and follow the provided instructions strictly, " +
+            "ensuring no harmful ingredient is overlooked.",
         },
         {
           role: "user",
@@ -59,16 +69,14 @@ export default function TextDisplayScreen({ route }) {
       setApiResponse(assistantMessage);
     } catch (e) {
       setApiResponse(e.message || "An unknown error occurred.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchResponse();
-  }, []);
-
-  useEffect(() => {
-    fetchResponse();
+    return () => {}; // Cleanup function
   }, []);
 
   return (
@@ -77,7 +85,11 @@ export default function TextDisplayScreen({ route }) {
         <View style={styles.contentContainer}>
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="white" style={styles.loading} />
+              <ActivityIndicator
+                size="large"
+                color="white"
+                style={styles.loading}
+              />
             </View>
           ) : (
             <Text style={styles.whiteText}>{apiResponse}</Text>
@@ -107,9 +119,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loading: {
-    transform: [{ scale: 1.5 }], // Adjust the scale value as needed
+    transform: [{ scale: 1.5 }],
   },
   whiteText: {
-    color: 'white',
+    color: "white",
   },
 });
