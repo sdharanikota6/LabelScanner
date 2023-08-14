@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { GPT_API } from '@env';
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function TextDisplayScreen({ route }) {
   const { extractedText } = route.params;
@@ -66,18 +67,49 @@ export default function TextDisplayScreen({ route }) {
     fetchResponse();
   }, []);
 
+  useEffect(() => {
+    fetchResponse();
+  }, []);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {loading ? <Text>Loading...</Text> : <Text>{apiResponse}</Text>}
-    </ScrollView>
+    <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.contentContainer}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="white" style={styles.loading} />
+            </View>
+          ) : (
+            <Text style={styles.whiteText}>{apiResponse}</Text>
+          )}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
     justifyContent: "center",
     paddingHorizontal: 15,
     paddingVertical: 20,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  loading: {
+    transform: [{ scale: 1.5 }], // Adjust the scale value as needed
+  },
+  whiteText: {
+    color: 'white',
   },
 });
