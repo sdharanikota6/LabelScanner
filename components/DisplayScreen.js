@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { GPT_API } from '@env';
 
 export default function TextDisplayScreen({ route }) {
   const { extractedText } = route.params;
@@ -19,14 +20,13 @@ export default function TextDisplayScreen({ route }) {
     "Here is the text: " +
     extractedText;
 
-  const fetchResponse = async () => {
-    const endpointURL = "https://api.openai.com/v1/chat/completions";
-    const headers = {
-      Authorization:
-        "Bearer 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",
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
+    const fetchResponse = async () => {
+      const endpointURL = "https://api.openai.com/v1/chat/completions";
+      const headers = {
+        Authorization: `Bearer ${GPT_API}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
 
     const requestBody = {
       model: "gpt-3.5-turbo",
