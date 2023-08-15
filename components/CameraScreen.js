@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Button, Image, StyleSheet, Alert } from "react-native";
 import { Camera } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";
+
 
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -11,19 +11,17 @@ export default function CameraScreen({ navigation }) {
   useEffect(() => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      const galleryStatus =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
 
       if (
-        cameraStatus.status === "granted" &&
-        galleryStatus.status === "granted"
+        cameraStatus.status === "granted"
       ) {
         setHasPermission(true);
       } else {
         setHasPermission(false);
         Alert.alert(
           "Permission required",
-          "You need to grant camera and gallery permissions to use this feature."
+          "You need to grant camera permission to use this feature."
         );
       }
     })();
