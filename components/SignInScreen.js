@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
 import userPool from "./CognitoConfig";
+import { FontAwesome5 } from "@expo/vector-icons"; // Import FontAwesome5 icons
 
 export default function SignInScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -30,30 +32,53 @@ export default function SignInScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-        secureTextEntry
-      />
-      <Button title="Sign In" onPress={handleSignIn} />
-    </View>
+      <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
+        <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.loginText}>Login</Text>
+        <Text style={styles.subtitle}>Please sign in to continue</Text>
+        <TextInput
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          secureTextEntry
+        />
+        <TouchableOpacity onPress={handleSignIn} style={styles.signInButton}>
+          <FontAwesome5 name="sign-in-alt" size={24} color="white" />
+          <Text style={styles.signInButtonText}>Sign In</Text>
+        </TouchableOpacity>
+        </ScrollView>
+      </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 80,
+  },
+  gradient: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 15,
+    alignItems: "center",
+  },
+  loginText: {
+    fontSize: 36,
+    color: "white",
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "white",
+    marginBottom: 30,
   },
   input: {
     height: 40,
@@ -61,5 +86,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+    backgroundColor: "white",
+    borderRadius: 5,
+    width: "80%",
+  },
+  signInButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#333",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  signInButtonText: {
+    color: "white",
+    marginLeft: 10,
   },
 });
