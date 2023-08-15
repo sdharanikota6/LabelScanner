@@ -6,6 +6,7 @@ import { Camera } from "expo-camera";
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
+  const [donePressed, setDonePressed] = useState(false); // Track if "Done" is pressed
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -36,7 +37,8 @@ export default function CameraScreen({ navigation }) {
 
   const handleDone = async () => {
     try {
-      if (capturedPhoto) {
+      if (capturedPhoto && !donePressed) {
+        setDonePressed(true);
         // 1. Request a Signed URL
         const signedUrlResponse = await fetch(
           "https://bt29bcadb9.execute-api.us-east-2.amazonaws.com/prod/textract",
