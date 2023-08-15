@@ -1,10 +1,112 @@
-import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import {
+  CognitoUser,
+  CognitoUserPool,
+  AuthenticationDetails,
+  CognitoUserAttribute,
+} from "amazon-cognito-identity-js";
+import userPool from "./CognitoConfig";
 
 export default function HomeScreen({ navigation }) {
+  const [isSignUpModalVisible, setIsSignUpModalVisible] = useState(false);
+  const [isSignInModalVisible, setIsSignInModalVisible] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+  const [age, setAge] = useState("");
+  const [allergies, setAllergies] = useState("");
+  const [healthConcerns, setHealthConcerns] = useState("");
+  const [isVerificationModalVisible, setIsVerificationModalVisible] =
+    useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+
+  const verifyUser = () => {
+    const cognitoUser = new CognitoUser({
+      Username: username,
+      Pool: userPool,
+    });
+
+    cognitoUser.confirmRegistration(verificationCode, true, (err, result) => {
+      if (err) {
+        alert(err.message || JSON.stringify(err));
+        return;
+      }
+      alert("Verification successful! You can now sign in.");
+      setIsVerificationModalVisible(false);
+    });
+  };
+
+  const handleSignUp = () => {
+    const attributeList = [
+      new CognitoUserAttribute({
+        Name: "email",
+        Value: email,
+      }),
+      new CognitoUserAttribute({
+        Name: "gender",
+        Value: gender,
+      }),
+      new CognitoUserAttribute({
+        Name: "custom:age",
+        Value: age,
+      }),
+      new CognitoUserAttribute({
+        Name: "custom:allergies",
+        Value: allergies,
+      }),
+      new CognitoUserAttribute({
+        Name: "custom:healthconcerns",
+        Value: healthConcerns,
+      }),
+    ];
+
+    userPool.signUp(username, password, attributeList, null, (err, result) => {
+      if (err) {
+        alert(err.message || JSON.stringify(err));
+        return;
+      }
+      const cognitoUser = result.user;
+      console.log("user name is " + cognitoUser.getUsername());
+      setIsSignUpModalVisible(false); // Close sign up modal
+      setIsVerificationModalVisible(true); // Open verification modal
+    });
+  };
+
+  const handleSignIn = () => {
+    const authenticationDetails = new AuthenticationDetails({
+      Username: username,
+      Password: password,
+    });
+
+    const cognitoUser = new CognitoUser({
+      Username: username,
+      Pool: userPool,
+    });
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: (session) => {
+        console.log("Authentication successful:", session);
+        // Here you can redirect user or do other tasks upon successful authentication
+        setIsSignInModalVisible(false);
+      },
+      onFailure: (err) => {
+        console.error("Authentication failed:", err);
+      },
+    });
+  };
+
   const openGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -57,21 +159,24 @@ export default function HomeScreen({ navigation }) {
       } catch (error) {
         console.error("Error in openGallery:", error);
         if (error instanceof TypeError) {
-          console.error("Network request failed. Additional Info:", error.message);
+          console.error(
+            "Network request failed. Additional Info:",
+            error.message
+          );
         }
       }
     }
   };
 
   return (
-    <LinearGradient
-    colors={["#808080", "#1d1d1d"]} // gradient colors
-      style={styles.container}
-    >
+    <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.container}>
       <Text style={styles.welcomeText}>Welcome to LabelScanner</Text>
       <View style={styles.contentContainer}>
         <Text style={styles.instructionsText}>
-          To utilize this application, you have two options: capture a picture of an item's ingredients or select an image from your gallery. We will then promptly identify and inform you about any ingredients that may be harmful to you.
+          To utilize this application, you have two options: capture a picture
+          of an item's ingredients or select an image from your gallery. We will
+          then promptly identify and inform you about any ingredients that may
+          be harmful to you.
         </Text>
         <View style={styles.buttonContainer}>
           {/* Gallery button with icon */}
@@ -88,9 +193,111 @@ export default function HomeScreen({ navigation }) {
             <AntDesign name="camerao" size={24} color="white" />
             <Text style={styles.buttonText}>Camera</Text>
           </TouchableOpacity>
+
+          {/* Sign Up button to open the modal */}
+          <TouchableOpacity onPress={() => setIsSignUpModalVisible(true)}>
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsSignInModalVisible(true)}>
+            <Text style={styles.signInText}>Sign In</Text>
+          </TouchableOpacity>
         </View>
+
+        {isSignInModalVisible && (
+          <View style={styles.modalContainer}>
+            <TextInput
+              placeholder="Username"
+              onChangeText={setUsername}
+              value={username}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Password"
+              onChangeText={setPassword}
+              value={password}
+              secureTextEntry={true}
+              style={styles.input}
+            />
+            <Button title="Sign In" onPress={handleSignIn} />
+            <Button
+              title="Close"
+              onPress={() => setIsSignInModalVisible(false)}
+            />
+          </View>
+        )}
+
+        {isVerificationModalVisible && (
+          <View style={styles.modalContainer}>
+            <TextInput
+              placeholder="Verification Code"
+              onChangeText={setVerificationCode}
+              value={verificationCode}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+            <Button title="Verify" onPress={verifyUser} />
+            <Button
+              title="Close"
+              onPress={() => setIsVerificationModalVisible(false)}
+            />
+          </View>
+        )}
+
+        {isSignUpModalVisible && (
+          <View style={styles.modalContainer}>
+            <TextInput
+              placeholder="Username"
+              onChangeText={setUsername}
+              value={username}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Password"
+              onChangeText={setPassword}
+              value={password}
+              secureTextEntry={true}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Email"
+              onChangeText={setEmail}
+              value={email}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Gender"
+              onChangeText={setGender}
+              value={gender}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Age"
+              onChangeText={setAge}
+              value={age}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Allergies"
+              onChangeText={setAllergies}
+              value={allergies}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Health Concerns"
+              onChangeText={setHealthConcerns}
+              value={healthConcerns}
+              style={styles.input}
+            />
+            <Button title="Sign Up" onPress={handleSignUp} />
+            <Button
+              title="Close"
+              onPress={() => setIsSignUpModalVisible(false)}
+            />
+          </View>
+        )}
       </View>
-      </LinearGradient>
+    </LinearGradient>
   );
 }
 
@@ -151,5 +358,34 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     marginTop: 5,
+  },
+  modalContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.8)", // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  input: {
+    height: 40,
+    borderColor: "white",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    color: "white", // Text color
+    width: "80%", // Width of the input fields
+  },
+  signUpText: {
+    color: "white",
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  signInText: {
+    color: "white",
+    fontSize: 18,
+    marginBottom: 10,
   },
 });
