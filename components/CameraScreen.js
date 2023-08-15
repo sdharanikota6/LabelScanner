@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Button, Image, StyleSheet, Alert } from "react-native";
 import { Camera } from "expo-camera";
 
-
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
@@ -13,10 +12,7 @@ export default function CameraScreen({ navigation }) {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
 
-
-      if (
-        cameraStatus.status === "granted"
-      ) {
+      if (cameraStatus.status === "granted") {
         setHasPermission(true);
       } else {
         setHasPermission(false);
@@ -72,7 +68,7 @@ export default function CameraScreen({ navigation }) {
         const textractData = await textractResponse.json();
 
         // Navigate to the TextDisplayScreen after extracting the text
-        navigation.navigate("TextDisplay", {
+        navigation.navigate("DisplayScreen", {
           extractedText: textractData.text,
         });
       }

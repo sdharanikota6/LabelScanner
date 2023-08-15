@@ -36,7 +36,7 @@ export default function TextDisplayScreen({ route }) {
     };
 
     const requestBody = {
-      model: "gpt-3.5-turbo-0613-alpha-shared",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
