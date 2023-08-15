@@ -36,7 +36,7 @@ export default function TextDisplayScreen({ route }) {
     };
 
     const requestBody = {
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo-0613-alpha-shared",
       messages: [
         {
           role: "system",
@@ -61,6 +61,7 @@ export default function TextDisplayScreen({ route }) {
       });
 
       if (!response.ok) {
+        console.log(await response.text());
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
