@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Modal } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Button,
+  StyleSheet,
+  ScrollView,
+  Modal,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   CognitoUser,
@@ -8,7 +17,9 @@ import {
   CognitoUserAttribute,
 } from "amazon-cognito-identity-js";
 import userPool from "./CognitoConfig";
-import { FontAwesome5 } from "@expo/vector-icons"; // Import FontAwesome5 icons
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useContext } from "react";
+import { UserContext } from "./UserContext";
 
 export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -21,6 +32,7 @@ export default function SignUpScreen({ navigation }) {
   const [isVerificationModalVisible, setIsVerificationModalVisible] =
     useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  const { setUserData } = useContext(UserContext);
 
   const handleSignUp = () => {
     const attributeList = [
@@ -53,6 +65,14 @@ export default function SignUpScreen({ navigation }) {
       }
       setIsVerificationModalVisible(true);
     });
+
+    setUserData({
+      isGuest: false,
+      age: age, // Replace with appropriate variable
+      gender: gender,
+      allergies: allergies,
+      healthConcerns: healthConcerns,
+    });
   };
 
   const verifyUser = () => {
@@ -73,8 +93,8 @@ export default function SignUpScreen({ navigation }) {
   };
 
   return (
-      <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
-            <ScrollView contentContainerStyle={styles.container}>
+    <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.loginText}>Sign Up</Text>
         <Text style={styles.subtitle}>Please fill out the details below</Text>
         <TextInput
@@ -144,8 +164,8 @@ export default function SignUpScreen({ navigation }) {
             </View>
           </View>
         </Modal>
-        </ScrollView>
-      </LinearGradient>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 

@@ -1,13 +1,22 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js";
 import userPool from "./CognitoConfig";
-import { FontAwesome5 } from "@expo/vector-icons"; // Import FontAwesome5 icons
+import { FontAwesome5 } from "@expo/vector-icons";
+import { UserContext } from "./UserContext";
 
 export default function SignInScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserData } = useContext(UserContext);
 
   const handleSignIn = () => {
     const authenticationData = {
@@ -22,18 +31,35 @@ export default function SignInScreen({ navigation }) {
     });
 
     cognitoUser.authenticateUser(authenticationDetails, {
-      onSuccess: () => {
-        navigation.navigate("HomeScreen");
-      },
-      onFailure: (err) => {
-        alert(err.message || JSON.stringify(err));
+      onSuccess: (session) => {
+        cognitoUser.getUserAttributes((err, result) => {
+          if (err) {
+            alert(err.message || JSON.stringify(err));
+            return;
+          }
+
+          const attributes = {};
+          for (let i = 0; i < result.length; i++) {
+            attributes[result[i].getName()] = result[i].getValue();
+          }
+
+          setUserData({
+            isGuest: false,
+            age: attributes["custom:age"] || null,
+            gender: attributes["gender"] || null,
+            allergies: attributes["custom:allergies"] || null,
+            healthConcerns: attributes["custom:healthconcerns"] || null,
+          });
+
+          navigation.navigate("HomeScreen");
+        });
       },
     });
   };
 
   return (
-      <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.container}>
+    <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.loginText}>Login</Text>
         <Text style={styles.subtitle}>Please sign in to continue</Text>
         <TextInput
@@ -53,8 +79,8 @@ export default function SignInScreen({ navigation }) {
           <FontAwesome5 name="sign-in-alt" size={24} color="white" />
           <Text style={styles.signInButtonText}>Sign In</Text>
         </TouchableOpacity>
-        </ScrollView>
-      </LinearGradient>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
