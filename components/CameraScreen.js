@@ -2,12 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Button, Image, StyleSheet, Alert } from "react-native";
 import { Camera } from "expo-camera";
 
+/**
+ * CameraScreen component allows users to capture images using the device's camera
+ * and then process the captured image for text extraction.
+ */
+
 export default function CameraScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [donePressed, setDonePressed] = useState(false); // Track if "Done" is pressed
   const cameraRef = useRef(null);
 
+// Request camera permission on component mount
   useEffect(() => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
@@ -24,6 +30,7 @@ export default function CameraScreen({ navigation }) {
     })();
   }, []);
 
+  // Function to take a picture using the camera
   const takePicture = async () => {
     if (cameraRef) {
       const photo = await cameraRef.current.takePictureAsync();
@@ -31,6 +38,7 @@ export default function CameraScreen({ navigation }) {
     }
   };
 
+  // Function to handle processing of the captured image
   const handleDone = async () => {
     try {
       if (capturedPhoto && !donePressed) {
@@ -114,7 +122,7 @@ export default function CameraScreen({ navigation }) {
     </View>
   );
 }
-
+// Styles for the CameraScreen component
 const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,

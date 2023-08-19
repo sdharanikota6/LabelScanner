@@ -4,7 +4,13 @@ import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 
+/**
+ * HomeScreen component is the main screen of the app where users can choose to capture an image or select from gallery.
+ * The selected image is processed for text extraction and passed to the DisplayScreen for showing extracted text.
+ */
+
 export default function HomeScreen({ navigation }) {
+  // Function to process the selected image for text extraction
   const processImage = async (imageUri) => {
     try {
       // 1. Request a Signed URL
@@ -55,6 +61,7 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // Function to open the image gallery for selecting an image
   const openGallery = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -71,6 +78,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
+    // Linear gradient background for visual appeal
     <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.container}>
       <Text style={styles.welcomeText}>Welcome to LabelScanner</Text>
       <View style={styles.contentContainer}>
@@ -101,6 +109,7 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
+// Styles for the HomeScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

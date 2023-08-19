@@ -21,7 +21,14 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
+/**
+ * SignUpScreen component handles user registration.
+ * Users can sign up with various details including username, password, email, age, allergies, health concerns, and gender.
+ * It also handles verification through a modal with a verification code input.
+ */
+
 export default function SignUpScreen({ navigation }) {
+ // State variables for user registration and verification
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -32,9 +39,12 @@ export default function SignUpScreen({ navigation }) {
   const [isVerificationModalVisible, setIsVerificationModalVisible] =
     useState(false);
   const [verificationCode, setVerificationCode] = useState("");
+  // Access user context for managing user data
   const { setUserData } = useContext(UserContext);
 
+  // Handle user registration
   const handleSignUp = () => {
+    // Create a list of user attributes for registration
     const attributeList = [
       new CognitoUserAttribute({
         Name: "email",
@@ -58,23 +68,26 @@ export default function SignUpScreen({ navigation }) {
       }),
     ];
 
+    // Sign up the user using Cognito user pool
     userPool.signUp(username, password, attributeList, null, (err, result) => {
       if (err) {
         alert(err.message || JSON.stringify(err));
         return;
       }
-      setIsVerificationModalVisible(true);
+      setIsVerificationModalVisible(true); // Show verification modal
     });
 
+    // Update user data in context
     setUserData({
       isGuest: false,
-      age: age, // Replace with appropriate variable
+      age: age,
       gender: gender,
       allergies: allergies,
       healthConcerns: healthConcerns,
     });
   };
 
+ // Verify user registration with verification code
   const verifyUser = () => {
     const cognitoUser = new CognitoUser({
       Username: username,
@@ -88,15 +101,17 @@ export default function SignUpScreen({ navigation }) {
       }
       alert("Verification successful! You can now sign in.");
       setIsVerificationModalVisible(false);
-      navigation.navigate("Auth");
+      navigation.navigate("Auth"); // Navigate back to authentication screen
     });
   };
 
   return (
+    // Linear gradient background for visual appeal
     <LinearGradient colors={["#808080", "#1d1d1d"]} style={styles.gradient}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.loginText}>Sign Up</Text>
         <Text style={styles.subtitle}>Please fill out the details below</Text>
+        {/* Input fields for user details */}
         <TextInput
           placeholder="Username"
           value={username}
@@ -141,11 +156,13 @@ export default function SignUpScreen({ navigation }) {
           onChangeText={setGender}
           style={styles.input}
         />
+        {/* Sign Up button */}
         <TouchableOpacity onPress={handleSignUp} style={styles.signInButton}>
           <FontAwesome5 name="user-plus" size={24} color="white" />
           <Text style={styles.signInButtonText}>Sign Up</Text>
         </TouchableOpacity>
 
+        {/* Modal for verification code */}
         <Modal
           visible={isVerificationModalVisible}
           transparent={true}
@@ -154,12 +171,15 @@ export default function SignUpScreen({ navigation }) {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text>Enter Verification Code</Text>
+
+              {/* Verification code input */}
               <TextInput
                 placeholder="Verification Code"
                 value={verificationCode}
                 onChangeText={setVerificationCode}
                 style={styles.input}
               />
+              {/* Verify button */}
               <Button title="Verify" onPress={verifyUser} />
             </View>
           </View>
@@ -169,6 +189,7 @@ export default function SignUpScreen({ navigation }) {
   );
 }
 
+// Styles for the SignUpScreen component
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
