@@ -31,3 +31,7 @@ The app consists of several screens:
 - **Camera Screen**: The camera interface allows users to scan product labels and extract information.
 
 - **Display Screen**: Scanned label information is displayed on this screen in an organized and visually appealing manner.
+
+## Video of App
+https://github.com/user-attachments/assets/3f8a1d50-b1b4-47c6-ada8-34b78bb7b095
+
